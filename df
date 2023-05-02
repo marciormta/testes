@@ -1,43 +1,44 @@
+Para visualizar se conforme você aumenta o acionamento aumenta a sua volumetria de acordos, ou se o tipo de acionamento influencia na sua conversão de acordos, você pode usar alguns tipos de gráficos com Python. Um possível código para fazer isso é:
+
+# Importando as bibliotecas
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Carregando os dados
-df = pd.read_csv('caminho/do/arquivo.csv')
+# Lendo os dados do seu código
+df = pd.read_csv("dados.csv")
 
-# Criando a tabela de frequência com as contagens de cada categoria
-freq_table = pd.crosstab(index=[df['acionamento'], df['campanha']], columns=df['status_do_acordo'], normalize='index')
-
-# Plotando o gráfico
-colors = ['#2b6cb0', '#81e6d9', '#f5a3c7']
-ax = freq_table.plot(kind='bar', stacked=True, color=colors, figsize=(12, 8))
-
-# Configurando os rótulos e títulos
-ax.set_title('Contagem de cada tipo de status do acordo para cada categoria de acionamento e campanha', fontsize=16)
-ax.set_xlabel('Acionamento e Campanha', fontsize=14)
-ax.set_ylabel('Proporção', fontsize=14)
-ax.set_xticklabels(freq_table.index, rotation=45, fontsize=12)
-
-# Adicionando a legenda
-handles, labels = ax.get_legend_handles_labels()
-legend_labels = ['Concluído', 'Em Contato', 'Retirado']
-ax.legend(handles[::-1], legend_labels[::-1], loc='lower right', fontsize=12)
-
-# Adicionando os valores em cima de cada barra
-for i, rect in enumerate(ax.containers):
-    ax.bar_label(rect, labels=freq_table.values[i], label_type='edge', fontsize=12, padding=2)
-
-# Configurando as cores das bordas das barras
-for patch in ax.containers:
-    patch.set_edgecolor('grey')
-    patch.set_linewidth(0.5)
-
-# Removendo as bordas da legenda
-ax.get_legend().get_frame().set_linewidth(0.0)
-
-# Removendo o eixo y secundário
-ax.spines['right'].set_visible(False)
-ax.spines['top'].set_visible(False)
-
-# Exibindo o gráfico
+# Criando um gráfico de barras para mostrar a quantidade de acordos por tipo de acionamento
+sns.countplot(x="tipo_acionamento", hue="status_do_acordo", data=df)
+plt.title("Quantidade de acordos por tipo de acionamento")
+plt.xlabel("Tipo de acionamento")
+plt.ylabel("Quantidade de acordos")
+plt.legend(title="Status do acordo")
 plt.show()
+
+# Criando um gráfico de linha para mostrar a relação entre a quantidade de acionamentos e a probabilidade de conversão de acordo
+sns.lineplot(x="qtd_acionamento", y="probabilidade", data=df)
+plt.title("Relação entre quantidade de acionamentos e probabilidade de conversão")
+plt.xlabel("Quantidade de acionamentos")
+plt.ylabel("Probabilidade de conversão")
+plt.show()
+
+# Criando um gráfico de dispersão para mostrar a relação entre o tipo de acionamento e a probabilidade de conversão de acordo
+sns.scatterplot(x="tipo_acionamento", y="probabilidade", data=df)
+plt.title("Relação entre tipo de acionamento e probabilidade de conversão")
+plt.xlabel("Tipo de acionamento")
+plt.ylabel("Probabilidade de conversão")
+plt.show()
+
+Esse é um exemplo de código que você pode usar para visualizar os seus dados, mas existem muitas outras formas e tipos de gráficos que você pode explorar. Se quiser saber mais sobre como visualizar dados com Python, você pode consultar os links das fontes que eu usei para responder.👇
+
+¹: https://king.host/blog/2018/03/visualizacao-de-dados-matplotlib/
+²: https://medium.com/turing-talks/como-visualizar-e-analisar-dados-com-python-f209bfbae68e
+³: https://www.hashtagtreinamentos.com/analise-exploratoria-em-python-ciencia-dados/
+
+Origem: conversa com o Bing, 02/05/2023
+(1) Visualização de dados em Python: Matplotlib - Blog da KingHost. https://bing.com/search?q=como+visualizar+dados+em+python.
+(2) Quatro formas de visualizar seu DataFrame no Pandas. https://spacedata.com.br/quatro-formas-de-visualizar-seu-dataframe-no-pandas%e2%80%8b/.
+(3) Como visualizar e analisar dados com Python - Medium. https://medium.com/turing-talks/como-visualizar-e-analisar-dados-com-python-f209bfbae68e.
+(4) Visualização de dados em Python: Matplotlib - Blog da KingHost. https://king.host/blog/2018/03/visualizacao-de-dados-matplotlib/.
+(5) Análise Exploratória em Python - Iniciando Ciência de Dados. https://www.hashtagtreinamentos.com/analise-exploratoria-em-python-ciencia-dados.
