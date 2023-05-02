@@ -1,32 +1,16 @@
-Desculpe, eu assumi que você tinha o vetor probabilidade no seu código, mas se você não tem, você pode calcular ele usando o seu modelo de regressão logística. Para isso, você pode usar o método predict_proba do seu modelo, que retorna a probabilidade de cada classe para cada observação. Por exemplo, se você quiser calcular a probabilidade de conversão de acordo para o conjunto de teste, você pode fazer:
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Calculando a probabilidade de conversão de acordo para o conjunto de teste
-prob_test = model.predict_proba(X_test)
+# Importando os dados do Excel
+df = pd.read_excel('caminho/do/arquivo.xlsx')
 
-# Criando uma coluna com a probabilidade da classe "Concluído"
-df_test["probabilidade"] = prob_test[:, 0]
+# Criando o gráfico de dispersão
+sns.scatterplot(x='qtd_acionamento', y='status_do_acordo', hue='tipo_acionamento', data=df)
 
-# Visualizando as primeiras linhas do conjunto de teste com a nova coluna
-df_test.head()
+# Adicionando rótulos aos pontos do gráfico
+for i in range(len(df)):
+    plt.annotate(df['status_do_acordo'][i], (df['qtd_acionamento'][i], df['status_do_acordo'][i]), textcoords="offset points", xytext=(0,10), ha='center')
 
-Para adicionar rótulos de dados em cada um dos gráficos, você pode usar o método annotate do matplotlib.pyplot. Esse método permite que você adicione texto em uma posição específica do gráfico. Você pode especificar o texto, as coordenadas x e y, o alinhamento horizontal e vertical, a cor e o tamanho da fonte. Por exemplo, se você quiser adicionar rótulos de dados no gráfico de barras, você pode fazer:
-
-# Criando um gráfico de barras para mostrar a quantidade de acordos por tipo de acionamento
-ax = sns.countplot(x="tipo_acionamento", hue="status_do_acordo", data=df)
-plt.title("Quantidade de acordos por tipo de acionamento")
-plt.xlabel("Tipo de acionamento")
-plt.ylabel("Quantidade de acordos")
-plt.legend(title="Status do acordo")
-
-# Adicionando rótulos de dados em cada barra
-for p in ax.patches:
-    x = p.get_x() + p.get_width() / 2 # coordenada x do centro da barra
-    y = p.get_y() + p.get_height() # coordenada y do topo da barra
-    value = int(p.get_height()) # valor da altura da barra
-    ax.annotate(value, (x, y), ha="center", va="bottom", color="black", fontsize=12) # adicionando o texto
-
+# Exibindo o gráfico
 plt.show()
-
-Esse é um exemplo de como adicionar rótulos de dados em um gráfico de barras, mas você pode fazer o mesmo para outros tipos de gráficos. Se quiser saber mais sobre como usar o método annotate, você pode consultar a documentação do matplotlib.pyplot.👇
-
-: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.annotate.html
