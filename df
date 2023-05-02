@@ -1,44 +1,32 @@
-Para visualizar se conforme você aumenta o acionamento aumenta a sua volumetria de acordos, ou se o tipo de acionamento influencia na sua conversão de acordos, você pode usar alguns tipos de gráficos com Python. Um possível código para fazer isso é:
+Desculpe, eu assumi que você tinha o vetor probabilidade no seu código, mas se você não tem, você pode calcular ele usando o seu modelo de regressão logística. Para isso, você pode usar o método predict_proba do seu modelo, que retorna a probabilidade de cada classe para cada observação. Por exemplo, se você quiser calcular a probabilidade de conversão de acordo para o conjunto de teste, você pode fazer:
 
-# Importando as bibliotecas
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+# Calculando a probabilidade de conversão de acordo para o conjunto de teste
+prob_test = model.predict_proba(X_test)
 
-# Lendo os dados do seu código
-df = pd.read_csv("dados.csv")
+# Criando uma coluna com a probabilidade da classe "Concluído"
+df_test["probabilidade"] = prob_test[:, 0]
+
+# Visualizando as primeiras linhas do conjunto de teste com a nova coluna
+df_test.head()
+
+Para adicionar rótulos de dados em cada um dos gráficos, você pode usar o método annotate do matplotlib.pyplot. Esse método permite que você adicione texto em uma posição específica do gráfico. Você pode especificar o texto, as coordenadas x e y, o alinhamento horizontal e vertical, a cor e o tamanho da fonte. Por exemplo, se você quiser adicionar rótulos de dados no gráfico de barras, você pode fazer:
 
 # Criando um gráfico de barras para mostrar a quantidade de acordos por tipo de acionamento
-sns.countplot(x="tipo_acionamento", hue="status_do_acordo", data=df)
+ax = sns.countplot(x="tipo_acionamento", hue="status_do_acordo", data=df)
 plt.title("Quantidade de acordos por tipo de acionamento")
 plt.xlabel("Tipo de acionamento")
 plt.ylabel("Quantidade de acordos")
 plt.legend(title="Status do acordo")
+
+# Adicionando rótulos de dados em cada barra
+for p in ax.patches:
+    x = p.get_x() + p.get_width() / 2 # coordenada x do centro da barra
+    y = p.get_y() + p.get_height() # coordenada y do topo da barra
+    value = int(p.get_height()) # valor da altura da barra
+    ax.annotate(value, (x, y), ha="center", va="bottom", color="black", fontsize=12) # adicionando o texto
+
 plt.show()
 
-# Criando um gráfico de linha para mostrar a relação entre a quantidade de acionamentos e a probabilidade de conversão de acordo
-sns.lineplot(x="qtd_acionamento", y="probabilidade", data=df)
-plt.title("Relação entre quantidade de acionamentos e probabilidade de conversão")
-plt.xlabel("Quantidade de acionamentos")
-plt.ylabel("Probabilidade de conversão")
-plt.show()
+Esse é um exemplo de como adicionar rótulos de dados em um gráfico de barras, mas você pode fazer o mesmo para outros tipos de gráficos. Se quiser saber mais sobre como usar o método annotate, você pode consultar a documentação do matplotlib.pyplot.👇
 
-# Criando um gráfico de dispersão para mostrar a relação entre o tipo de acionamento e a probabilidade de conversão de acordo
-sns.scatterplot(x="tipo_acionamento", y="probabilidade", data=df)
-plt.title("Relação entre tipo de acionamento e probabilidade de conversão")
-plt.xlabel("Tipo de acionamento")
-plt.ylabel("Probabilidade de conversão")
-plt.show()
-
-Esse é um exemplo de código que você pode usar para visualizar os seus dados, mas existem muitas outras formas e tipos de gráficos que você pode explorar. Se quiser saber mais sobre como visualizar dados com Python, você pode consultar os links das fontes que eu usei para responder.👇
-
-¹: https://king.host/blog/2018/03/visualizacao-de-dados-matplotlib/
-²: https://medium.com/turing-talks/como-visualizar-e-analisar-dados-com-python-f209bfbae68e
-³: https://www.hashtagtreinamentos.com/analise-exploratoria-em-python-ciencia-dados/
-
-Origem: conversa com o Bing, 02/05/2023
-(1) Visualização de dados em Python: Matplotlib - Blog da KingHost. https://bing.com/search?q=como+visualizar+dados+em+python.
-(2) Quatro formas de visualizar seu DataFrame no Pandas. https://spacedata.com.br/quatro-formas-de-visualizar-seu-dataframe-no-pandas%e2%80%8b/.
-(3) Como visualizar e analisar dados com Python - Medium. https://medium.com/turing-talks/como-visualizar-e-analisar-dados-com-python-f209bfbae68e.
-(4) Visualização de dados em Python: Matplotlib - Blog da KingHost. https://king.host/blog/2018/03/visualizacao-de-dados-matplotlib/.
-(5) Análise Exploratória em Python - Iniciando Ciência de Dados. https://www.hashtagtreinamentos.com/analise-exploratoria-em-python-ciencia-dados.
+: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.annotate.html
