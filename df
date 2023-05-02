@@ -1,16 +1,43 @@
-# Agrupa os dados por acionamento, campanha e status do acordo e conta as ocorrências
-grouped = df.groupby(['Acionamento', 'Campanha', 'Status_do_Acordo'])['Status_do_Acordo'].count()
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Reformata os dados em um DataFrame com as colunas Status_do_Acordo e valores contados
-stacked = grouped.unstack('Status_do_Acordo')
+# Carregando os dados
+df = pd.read_csv('caminho/do/arquivo.csv')
 
-# Cria um gráfico de barras empilhadas
-stacked.plot(kind='bar', stacked=True)
+# Criando a tabela de frequência com as contagens de cada categoria
+freq_table = pd.crosstab(index=[df['acionamento'], df['campanha']], columns=df['status_do_acordo'], normalize='index')
 
-# Define o título do gráfico e dos eixos
-plt.title('Contagem de cada tipo de status do acordo para cada categoria de acionamento e campanha')
-plt.xlabel('Categoria')
-plt.ylabel('Contagem')
+# Plotando o gráfico
+colors = ['#2b6cb0', '#81e6d9', '#f5a3c7']
+ax = freq_table.plot(kind='bar', stacked=True, color=colors, figsize=(12, 8))
 
-# Exibe o gráfico
+# Configurando os rótulos e títulos
+ax.set_title('Contagem de cada tipo de status do acordo para cada categoria de acionamento e campanha', fontsize=16)
+ax.set_xlabel('Acionamento e Campanha', fontsize=14)
+ax.set_ylabel('Proporção', fontsize=14)
+ax.set_xticklabels(freq_table.index, rotation=45, fontsize=12)
+
+# Adicionando a legenda
+handles, labels = ax.get_legend_handles_labels()
+legend_labels = ['Concluído', 'Em Contato', 'Retirado']
+ax.legend(handles[::-1], legend_labels[::-1], loc='lower right', fontsize=12)
+
+# Adicionando os valores em cima de cada barra
+for i, rect in enumerate(ax.containers):
+    ax.bar_label(rect, labels=freq_table.values[i], label_type='edge', fontsize=12, padding=2)
+
+# Configurando as cores das bordas das barras
+for patch in ax.containers:
+    patch.set_edgecolor('grey')
+    patch.set_linewidth(0.5)
+
+# Removendo as bordas da legenda
+ax.get_legend().get_frame().set_linewidth(0.0)
+
+# Removendo o eixo y secundário
+ax.spines['right'].set_visible(False)
+ax.spines['top'].set_visible(False)
+
+# Exibindo o gráfico
 plt.show()
