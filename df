@@ -2,15 +2,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Importando os dados do Excel
-df = pd.read_excel('caminho/do/arquivo.xlsx')
+# Importar os dados do Excel
+df = pd.read_excel('caminho/para/o/arquivo.xlsx')
 
-# Criando o gráfico de dispersão
-sns.scatterplot(x='qtd_acionamento', y='status_do_acordo', hue='tipo_acionamento', data=df)
+# Gerar o gráfico de dispersão
+sns.scatterplot(data=df, x='qtd_acionamento', y='status_do_acordo', hue='tipo_acionamento')
 
-# Adicionando rótulos aos pontos do gráfico
-for i in range(len(df)):
-    plt.annotate(df['status_do_acordo'][i], (df['qtd_acionamento'][i], df['status_do_acordo'][i]), textcoords="offset points", xytext=(0,10), ha='center')
-
-# Exibindo o gráfico
+# Adicionar títulos e legendas
+plt.title('Relação entre Quantidade de Acionamentos e Status do Acordo')
+plt.xlabel('Quantidade de Acionamentos')
+plt.ylabel('Status do Acordo')
+plt.legend(title='Canal Associado')
 plt.show()
