@@ -1,0 +1,16 @@
+# Agrupa os dados por acionamento, campanha e status do acordo e conta as ocorrências
+grouped = df.groupby(['Acionamento', 'Campanha', 'Status_do_Acordo'])['Status_do_Acordo'].count()
+
+# Reformata os dados em um DataFrame com as colunas Status_do_Acordo e valores contados
+stacked = grouped.unstack('Status_do_Acordo')
+
+# Cria um gráfico de barras empilhadas
+stacked.plot(kind='bar', stacked=True)
+
+# Define o título do gráfico e dos eixos
+plt.title('Contagem de cada tipo de status do acordo para cada categoria de acionamento e campanha')
+plt.xlabel('Categoria')
+plt.ylabel('Contagem')
+
+# Exibe o gráfico
+plt.show()
