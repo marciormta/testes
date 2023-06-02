@@ -6,27 +6,17 @@ pasta_origem = 'caminho/da/pasta/origem'  # Pasta com as planilhas originais
 pasta_destino = 'caminho/da/pasta/destino'  # Pasta com as planilhas atualizadas pelos escritórios
 
 # Função para verificar se houve alteração na coluna "Observação_Escritorio"
-def verificar_alteracao(planilha_original, planilha_atualizada):
-    # Carregar as planilhas originais e atualizadas
-    df_original = pd.read_excel(planilha_original, sheet_name=None)
-    df_atualizada = pd.read_excel(planilha_atualizada, sheet_name=None)
+def verificar_alteracao(aba_original, aba_atualizada):
+    coluna_observacao_original = aba_original['Observação_Escritorio']
+    coluna_observacao_atualizada = aba_atualizada['Observação_Escritorio']
     
-    # Verificar alterações em cada planilha e aba
-    for nome_planilha, aba_original in df_original.items():
-        aba_atualizada = df_atualizada[nome_planilha]
-        coluna_observacao_original = aba_original['Observação_Escritorio']
-        coluna_observacao_atualizada = aba_atualizada['Observação_Escritorio']
-        
-        # Verificar se houve alteração na coluna "Observação_Escritorio"
-        if not coluna_observacao_original.equals(coluna_observacao_atualizada):
-            aba_atualizada['Alteração'] = 'Sim'  # Criar coluna "Alteração" e definir valor como "Sim"
-        else:
-            aba_atualizada['Alteração'] = 'Não'  # Criar coluna "Alteração" e definir valor como "Não"
-        
-        # Atualizar a planilha atualizada com as alterações
-        df_atualizada[nome_planilha] = aba_atualizada
+    # Verificar se houve alteração na coluna "Observação_Escritorio"
+    if not coluna_observacao_original.equals(coluna_observacao_atualizada):
+        aba_atualizada['Alteração'] = 'Sim'  # Criar coluna "Alteração" e definir valor como "Sim"
+    else:
+        aba_atualizada['Alteração'] = 'Não'  # Criar coluna "Alteração" e definir valor como "Não"
     
-    return df_atualizada
+    return aba_atualizada
 
 # Percorrer todas as planilhas
 for nome_arquivo in os.listdir(pasta_origem):
@@ -34,10 +24,21 @@ for nome_arquivo in os.listdir(pasta_origem):
         planilha_original = os.path.join(pasta_origem, nome_arquivo)
         planilha_atualizada = os.path.join(pasta_destino, nome_arquivo)
         
-        # Verificar as alterações na planilha atualizada
-        df_atualizada = verificar_alteracao(planilha_original, planilha_atualizada)
+        # Carregar as planilhas originais e atualizadas
+        df_original = pd.read_excel(planilha_original, sheet_name=None)
+        df_atualizada = pd.read_excel(planilha_atualizada, sheet_name=None)
+        
+        # Verificar as alterações em cada planilha e aba
+        for nome_planilha in df_original.keys():
+            for nome_aba in df_original[nome_planilha].keys():
+                aba_original = df_original[nome_planilha][nome_aba]
+                aba_atualizada = df_atualizada[nome_planilha][nome_aba]
+                
+                # Verificar as alterações na aba atualizada
+                df_atualizada[nome_planilha][nome_aba] = verificar_alteracao(aba_original, aba_atualizada)
         
         # Salvar a planilha atualizada com as alterações
         with pd.ExcelWriter(planilha_atualizada) as writer:
-            for nome_planilha, aba_atualizada in df_atualizada.items():
-                aba_atualizada.to_excel(writer, sheet_name=nome_planilha, index=False)
+            for nome_planilha in df_atualizada.keys():
+                for nome_aba, aba_atualizada in df_atualizada[nome_planilha].items():
+                    aba_atualizada.to_excel(writer, sheet_name=nome_aba, index=False)
