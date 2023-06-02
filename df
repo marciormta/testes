@@ -18,25 +18,26 @@ def verificar_alteracao(aba_original, aba_atualizada):
     
     return aba_atualizada
 
-# Percorrer todas as planilhas
-for escritorio in range(1, 14):
-    nome_planilha = f'Escritorio{escritorio}.xlsx'
-    planilha_original = os.path.join(pasta_origem, nome_planilha)
-    planilha_atualizada = os.path.join(pasta_destino, nome_planilha)
-    
-    # Carregar as planilhas originais e atualizadas
-    df_original = pd.read_excel(planilha_original, sheet_name=None)
-    df_atualizada = pd.read_excel(planilha_atualizada, sheet_name=None)
-    
-    # Verificar as alterações em cada planilha e aba
-    for aba in ['dupli', 'pagam', 'compr', 'testa3']:
-        aba_original = df_original[aba]
-        aba_atualizada = df_atualizada[aba]
+# Percorrer todos os escritórios
+for nome_arquivo in os.listdir(pasta_origem):
+    if nome_arquivo.endswith('.xlsx'):
+        nome_escritorio = os.path.splitext(nome_arquivo)[0]  # Nome do escritório sem a extensão
+        planilha_original = os.path.join(pasta_origem, nome_arquivo)
+        planilha_atualizada = os.path.join(pasta_destino, nome_arquivo)
         
-        # Verificar as alterações na aba atualizada
-        df_atualizada[aba] = verificar_alteracao(aba_original, aba_atualizada)
-    
-    # Salvar a planilha atualizada com as alterações
-    with pd.ExcelWriter(planilha_atualizada) as writer:
-        for aba, df in df_atualizada.items():
-            df.to_excel(writer, sheet_name=aba, index=False)
+        # Carregar as planilhas originais e atualizadas
+        df_original = pd.read_excel(planilha_original, sheet_name=None)
+        df_atualizada = pd.read_excel(planilha_atualizada, sheet_name=None)
+        
+        # Verificar as alterações em cada planilha e aba
+        for aba in ['dupli', 'pagam', 'compr', 'testa3']:
+            aba_original = df_original[aba]
+            aba_atualizada = df_atualizada[aba]
+            
+            # Verificar as alterações na aba atualizada
+            df_atualizada[aba] = verificar_alteracao(aba_original, aba_atualizada)
+        
+        # Salvar a planilha atualizada com as alterações
+        with pd.ExcelWriter(planilha_atualizada) as writer:
+            for aba, df in df_atualizada.items():
+                df.to_excel(writer, sheet_name=aba, index=False)
