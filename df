@@ -1,16 +1,35 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-# Importar os dados do Excel
-df = pd.read_excel('caminho/para/o/arquivo.xlsx')
+# Lista com os nomes dos escritórios
+escritorios = ['Escritório 1', 'Escritório 2', 'Escritório 3', 'Escritório 4', 'Escritório 5',
+               'Escritório 6', 'Escritório 7', 'Escritório 8', 'Escritório 9', 'Escritório 10',
+               'Escritório 11', 'Escritório 12', 'Escritório 13']
 
-# Gerar o gráfico de dispersão
-sns.scatterplot(data=df, x='qtd_acionamento', y='status_do_acordo', hue='tipo_acionamento')
+# Função para verificar as alterações
+def verificar_alteracoes():
+    for escritorio in escritorios:
+        # Carrega a planilha original
+        planilha_original = pd.read_excel(f'{escritorio}_original.xlsx', sheet_name=None)
 
-# Adicionar títulos e legendas
-plt.title('Relação entre Quantidade de Acionamentos e Status do Acordo')
-plt.xlabel('Quantidade de Acionamentos')
-plt.ylabel('Status do Acordo')
-plt.legend(title='Canal Associado')
-plt.show()
+        # Carrega a planilha atualizada pelo escritório
+        planilha_atualizada = pd.read_excel(f'{escritorio}_atualizacao.xlsx', sheet_name=None)
+
+        # Verifica as alterações em cada aba
+        for aba in planilha_original.keys():
+            # Verifica se a coluna "Observação_Escritorio" existe na aba
+            if 'Observação_Escritorio' in planilha_original[aba].columns:
+                # Verifica se houve alteração na coluna "Observação_Escritorio"
+                alteracao = (planilha_original[aba]['Observação_Escritorio'] !=
+                             planilha_atualizada[aba]['Observação_Escritorio'])
+
+                # Adiciona a coluna "Alteração" com "Sim" ou "Não"
+                planilha_atualizada[aba]['Alteração'] = ['Sim' if x else 'Não' for x in alteracao]
+
+        # Salva a planilha com as alterações
+        writer = pd.ExcelWriter(f'{escritorio}_com_alteracoes.xlsx', engine='xlsxwriter')
+        for sheet_name, df in planilha_atualizada.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+        writer.save()
+
+# Executa a função para verificar as alterações
+verificar_alteracoes()
