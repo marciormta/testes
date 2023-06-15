@@ -1,1 +1,41 @@
 # testes
+import pandas as pd
+import os
+
+# Diretório onde as planilhas estão localizadas
+diretorio = 'Caminho/Para/Pasta_Escritorios'
+
+# Crie um dataframe vazio para cada aba
+df_basegarantia = pd.DataFrame()
+df_encerramentos = pd.DataFrame()
+df_cumprimento_sentenca = pd.DataFrame()
+df_duplicidades = pd.DataFrame()
+
+# Percorra todos os arquivos na pasta
+for arquivo in os.listdir(diretorio):
+    if arquivo.endswith(".xlsx"):  # Verifique se é um arquivo Excel
+        caminho_arquivo = os.path.join(diretorio, arquivo)
+        # Leitura das abas específicas em cada arquivo
+        xls = pd.ExcelFile(caminho_arquivo)
+        for aba in ['basegarantia', 'encerramentos', 'cumprimento sentença', 'duplicidades']:
+            df = pd.read_excel(xls, aba)
+            if 'alteração' in df.columns:
+                df.drop(columns=['alteração'], inplace=True)  # Remover a coluna 'alteração'
+            # Concatenar os dados de cada aba com os dataframes vazios
+            if aba == 'basegarantia':
+                df_basegarantia = pd.concat([df_basegarantia, df])
+            elif aba == 'encerramentos':
+                df_encerramentos = pd.concat([df_encerramentos, df])
+            elif aba == 'cumprimento sentença':
+                df_cumprimento_sentenca = pd.concat([df_cumprimento_sentenca, df])
+            elif aba == 'duplicidades':
+                df_duplicidades = pd.concat([df_duplicidades, df])
+
+# Criar um arquivo Excel com as quatro abas
+with pd.ExcelWriter('Planilhas_Combinadas.xlsx') as writer:
+    df_basegarantia.to_excel(writer, sheet_name='basegarantia', index=False)
+    df_encerramentos.to_excel(writer, sheet_name='encerramentos', index=False)
+    df_cumprimento_sentenca.to_excel(writer, sheet_name='cumprimento sentença', index=False)
+    df_duplicidades.to_excel(writer, sheet_name='duplicidades', index=False)
+
+print("As planilhas foram combinadas com sucesso!")
