@@ -1,43 +1,32 @@
-import os
 import pandas as pd
+import os
 
-# Definir os diretórios das pastas de origem e destino
-pasta_origem = 'caminho/da/pasta/origem'  # Pasta com as planilhas originais
-pasta_destino = 'caminho/da/pasta/destino'  # Pasta com as planilhas atualizadas pelos escritórios
+# Diretório onde as planilhas estão localizadas
+diretorio = 'Caminho/Para/Pasta_Escritorios'
 
-# Função para verificar se houve alteração na coluna "Observação_Escritorio"
-def verificar_alteracao(aba_original, aba_atualizada):
-    coluna_observacao_original = aba_original['Observação_Escritorio']
-    coluna_observacao_atualizada = aba_atualizada['Observação_Escritorio']
-    
-    # Verificar se houve alteração na coluna "Observação_Escritorio"
-    if not coluna_observacao_original.equals(coluna_observacao_atualizada):
-        aba_atualizada['Alteração'] = 'Sim'  # Criar coluna "Alteração" e definir valor como "Sim"
-    else:
-        aba_atualizada['Alteração'] = 'Não'  # Criar coluna "Alteração" e definir valor como "Não"
-    
-    return aba_atualizada
+# Crie um dataframe vazio para cada aba
+df_basegarantia = pd.DataFrame()
+df_encerramentos = pd.DataFrame()
+df_cumprimento_sentenca = pd.DataFrame()
+df_duplicidades = pd.DataFrame()
 
-# Percorrer todos os escritórios
-for nome_arquivo in os.listdir(pasta_origem):
-    if nome_arquivo.endswith('.xlsx'):
-        nome_escritorio = os.path.splitext(nome_arquivo)[0]  # Nome do escritório sem a extensão
-        planilha_original = os.path.join(pasta_origem, nome_arquivo)
-        planilha_atualizada = os.path.join(pasta_destino, nome_arquivo)
-        
-        # Carregar as planilhas originais e atualizadas
-        df_original = pd.read_excel(planilha_original, sheet_name=None)
-        df_atualizada = pd.read_excel(planilha_atualizada, sheet_name=None)
-        
-        # Verificar as alterações em cada planilha e aba
-        for aba in ['dupli', 'pagam', 'compr', 'testa3']:
-            aba_original = df_original[aba]
-            aba_atualizada = df_atualizada[aba]
-            
-            # Verificar as alterações na aba atualizada
-            df_atualizada[aba] = verificar_alteracao(aba_original, aba_atualizada)
-        
-        # Salvar a planilha atualizada com as alterações
-        with pd.ExcelWriter(planilha_atualizada) as writer:
-            for aba, df in df_atualizada.items():
-                df.to_excel(writer, sheet_name=aba, index=False)
+# Percorra todos os arquivos na pasta
+for arquivo in os.listdir(diretorio):
+    if arquivo.endswith(".xlsx"):  # Verifique se é um arquivo Excel
+        caminho_arquivo = os.path.join(diretorio, arquivo)
+        # Leitura das abas específicas em cada arquivo
+        df = pd.read_excel(caminho_arquivo, sheet_name=['basegarantia', 'encerramentos', 'cumprimento sentença', 'duplicidades'])
+        # Concatenar os dados de cada aba com os dataframes vazios
+        df_basegarantia = pd.concat([df_basegarantia, df['basegarantia']])
+        df_encerramentos = pd.concat([df_encerramentos, df['encerramentos']])
+        df_cumprimento_sentenca = pd.concat([df_cumprimento_sentenca, df['cumprimento sentença']])
+        df_duplicidades = pd.concat([df_duplicidades, df['duplicidades']])
+
+# Criar um arquivo Excel com as quatro abas
+with pd.ExcelWriter('Planilhas_Combinadas.xlsx') as writer:
+    df_basegarantia.to_excel(writer, sheet_name='basegarantia', index=False)
+    df_encerramentos.to_excel(writer, sheet_name='encerramentos', index=False)
+    df_cumprimento_sentenca.to_excel(writer, sheet_name='cumprimento sentença', index=False)
+    df_duplicidades.to_excel(writer, sheet_name='duplicidades', index=False)
+
+print("As planilhas foram combinadas com sucesso!")
